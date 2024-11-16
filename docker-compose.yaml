@@ -1,17 +1,12 @@
 version: '3.8'
 
 services:
-  webcontainer:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+  app:
+    build: .
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-    volumes:
-      - ./workspace:/app/workspace
     restart: unless-stopped
-    privileged: true  # Required for WebContainer
