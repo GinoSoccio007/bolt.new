@@ -2,17 +2,22 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json .
-COPY server.js .
+# Install dependencies
+RUN apk add --no-cache git python3 make g++ wget
 
-# Install dependencies including health check tools
-RUN apk add --no-cache wget \
-    && npm install
+# Clone the Stackblitz Bolt repository
+RUN git clone https://github.com/stackblitz/bolt.git .
 
-# Expose port
+# Install pnpm
+RUN npm install -g pnpm@9.4.0
+
+# Install dependencies
+RUN pnpm install
+
+# Build the application
+RUN pnpm run build
+
 EXPOSE 3000
 
-# Start application
-CMD ["node", "server.js"]
-
+# Start the application
+CMD ["pnpm", "start"]
