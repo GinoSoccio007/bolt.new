@@ -1,39 +1,56 @@
-const express = require('express');
-const path = require('path');
-const app = express();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web App Creator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Projects</h2>
+            <button onclick="showNewProjectModal()" class="btn-primary">New Project</button>
+            <div id="projectList" class="project-list">
+                <!-- Projects will be listed here -->
+            </div>
+        </div>
 
-// Middleware
-app.use(express.static('public'));
-app.use(express.json());
+        <!-- Main Content -->
+        <div class="main-content">
+            <div id="editorContainer" class="editor-container">
+                <div class="editor-tabs" id="fileTabs"></div>
+                <div id="monaco-editor" class="code-editor"></div>
+            </div>
+        </div>
+    </div>
 
-// Store projects in memory
-const projects = [];
+    <!-- New Project Modal -->
+    <div id="newProjectModal" class="modal">
+        <div class="modal-content">
+            <h2>Create New Project</h2>
+            <form id="newProjectForm" onsubmit="createProject(event)">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label>Template</label>
+                    <select id="projectTemplate">
+                        <option value="react">React</option>
+                        <option value="vue">Vue.js</option>
+                        <option value="static">Static HTML/CSS/JS</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Create</button>
+            </form>
+        </div>
+    </div>
 
-// Main page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Create new project
-app.post('/api/projects', (req, res) => {
-    const { name, type } = req.body;
-    const project = {
-        id: Date.now(),
-        name,
-        type,
-        created: new Date().toISOString()
-    };
-    projects.push(project);
-    res.json(project);
-});
-
-// Get all projects
-app.get('/api/projects', (req, res) => {
-    res.json(projects);
-});
-
-// Start server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+    <script src="js/editor.js"></script>
+    <script src="js/projects.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
