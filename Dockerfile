@@ -2,17 +2,20 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies
-RUN apk add --no-cache git
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
 
-# Copy package.json first
+# Copy package files
 COPY package.json .
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy application files
 COPY . .
+
+# Create project directory
+RUN mkdir -p projects
 
 EXPOSE 3000
 
