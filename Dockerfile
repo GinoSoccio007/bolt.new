@@ -2,9 +2,6 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
-
 # Copy package files
 COPY package.json .
 
@@ -14,8 +11,8 @@ RUN npm install
 # Copy application files
 COPY . .
 
-# Create project directory
-RUN mkdir -p projects
+# Create directories
+RUN mkdir -p data projects
 
 EXPOSE 3000
 
