@@ -1,11 +1,9 @@
 const express = require('express');
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Root endpoint - this should match exactly with your URL
 app.get('/', (req, res) => {
   res.send(`
     <html>
@@ -39,7 +37,6 @@ app.get('/', (req, res) => {
           <h1>Bolt Server Status</h1>
           <div class="status-box">
             <h2>✅ Server is Running</h2>
-            <p><strong>URL:</strong> ${req.protocol}://${req.get('host')}${req.originalUrl}</p>
             <p><strong>Environment:</strong> ${process.env.NODE_ENV || 'development'}</p>
             <p><strong>Port:</strong> ${process.env.PORT || 3000}</p>
             <p><strong>Username:</strong> ${process.env.BOLT_USERNAME}</p>
@@ -51,20 +48,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Catch all routes to prevent 404
-app.use((req, res) => {
-  res.redirect('/');
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
-
 const port = process.env.PORT || 3000;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Username: ${process.env.BOLT_USERNAME}`);
 });
