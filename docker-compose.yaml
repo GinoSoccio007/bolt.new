@@ -2,21 +2,20 @@ version: '3.8'
 
 services:
   bolt:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: node:18-alpine
     container_name: bolt-app
+    working_dir: /app
+    command: sh -c "npm install express && node server.js"
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - BOLT_DATABASE_URL=postgresql://postgres:Beachzipper66@bolt-db:5432/bolt
+      - DB_HOST=bolt-db
+      - DB_PASSWORD=Beachzipper66
       - BOLT_USERNAME=athompson
       - BOLT_PASSWORD=Beachzipper66
-      - BOLT_JWT_SECRET=eyJhbGciOiJIUzI1NiJ9X8B4z2pY9n3mK7vQ5tR8wL1xD0fG4jH6
     volumes:
       - ./:/app
-      - /app/node_modules
     depends_on:
       - bolt-db
     networks:
