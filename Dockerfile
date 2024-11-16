@@ -1,15 +1,23 @@
 FROM node:18-alpine
 
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.4.0 --activate
+
 WORKDIR /app
 
-RUN apk add --no-cache git
+# Copy package files
+COPY package.json pnpm-lock.yaml* ./
 
-RUN git clone https://github.com/thevahidal/bolt.git .
+# Install dependencies
+RUN pnpm install
 
-RUN npm install
+# Copy the rest of the application
+COPY . .
 
-RUN npm run build
+# Build the application
+RUN pnpm run build
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Start the application
+CMD ["pnpm", "start"]
