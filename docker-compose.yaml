@@ -1,26 +1,19 @@
-services:
-  app:
-    image: ghcr.io/thevahidal/bolt:latest
-    restart: always
-    ports:
-      - 3000:3000
-    environment:
-      - BOLT_DATABASE_URL=postgresql://postgres:Beachzipper66@db:5432/bolt
-      - BOLT_USERNAME=athompson
-      - BOLT_PASSWORD=Beachzipper66
-      - BOLT_JWT_SECRET=eyJhbGciOiJIUzI1NiJ9X8B4z2pY9n3mK7vQ5tR8wL1xD0fG4jH6
-      - NODE_ENV=production
-    depends_on:
-      - db
+FROM node:18-alpine
 
-  db:
-    image: postgres:14-alpine
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=Beachzipper66
-      - POSTGRES_DB=bolt
-    volumes:
-      - database:/var/lib/postgresql/data
+WORKDIR /app
 
-volumes:
-  database:
+# Install dependencies first (caching)
+COPY package*.json ./
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]
