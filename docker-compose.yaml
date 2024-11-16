@@ -2,8 +2,10 @@ version: '3.8'
 
 services:
   bolt:
-    build: .
+    image: node:18-alpine
     container_name: bolt-app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
     ports:
       - "3000:3000"
     environment:
@@ -12,6 +14,8 @@ services:
       - BOLT_PASSWORD=Beachzipper66
       - BOLT_JWT_SECRET=eyJhbGciOiJIUzI1NiJ9X8B4z2pY9n3mK7vQ5tR8wL1xD0fG4jH6
       - NODE_ENV=production
+    volumes:
+      - ./:/app
     depends_on:
       - bolt-db
     networks:
