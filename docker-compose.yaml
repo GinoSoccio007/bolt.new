@@ -1,28 +1,20 @@
 version: '3.8'
 
 services:
-  bolt:
-    image: node:18-alpine
-    working_dir: /app
-    command: sh -c "npm install && npm start"
+  bolt-app:
+    container_name: bolt-app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
       - PORT=3000
       - NODE_ENV=production
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-    volumes:
-      - ./:/app
     restart: unless-stopped
-
-  db:
-    image: postgres:14-alpine
-    environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=bolt
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
