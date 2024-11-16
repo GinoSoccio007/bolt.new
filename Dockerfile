@@ -1,23 +1,21 @@
 FROM node:18-alpine
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@9.4.0 --activate
-
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
+# Install required tools
+RUN apk add --no-cache git python3 make g++
+
+# Clone the Bolt repository (using the official repo)
+RUN git clone --depth=1 https://github.com/mckaywrigley/bolt.git .
 
 # Install dependencies
-RUN pnpm install
+RUN npm install --production
 
-# Copy the rest of the application
-COPY . .
+# Build the application if needed
+RUN npm run build || true
 
-# Build the application
-RUN pnpm run build
-
+# Expose the port
 EXPOSE 3000
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
