@@ -1,31 +1,19 @@
-FROM node:18-bullseye
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Install required dependencies for WebContainer
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    build-essential \
-    python3 \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies
+RUN apk add --no-cache git
 
-# Install pnpm
-RUN npm install -g pnpm@9.4.0
-
-# Clone WebContainer-based Bolt
-RUN git clone https://github.com/stackblitz/webcontainer-core.git .
+# Copy package files first
+COPY package.json .
+COPY package-lock.json .
+COPY server.js .
+COPY public ./public
 
 # Install dependencies
-RUN pnpm install
-
-# Build the application
-RUN pnpm run build
-
-# Create workspace directory
-RUN mkdir -p /app/workspace
+RUN npm install
 
 EXPOSE 3000
 
-# Start the application
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
