@@ -2,18 +2,16 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install necessary tools
-RUN apk add --no-cache curl tar
+# Copy package files
+COPY package.json .
+COPY server.js .
 
-# Download and extract the latest release
-RUN curl -L https://github.com/thevahidal/bolt/archive/refs/heads/main.tar.gz | tar xz --strip-components=1
+# Install dependencies including health check tools
+RUN apk add --no-cache wget \
+    && npm install
 
-# Install dependencies
-RUN npm install
-
-# Build the application
-RUN npm run build
-
+# Expose port
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Start application
+CMD ["node", "server.js"]
