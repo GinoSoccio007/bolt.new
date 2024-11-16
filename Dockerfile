@@ -2,20 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install required tools
-RUN apk add --no-cache git python3 make g++
-
-# Clone the Bolt repository (using the official repo)
-RUN git clone --depth=1 https://github.com/mckaywrigley/bolt.git .
+# Copy package files
+COPY package.json .
+COPY server.js .
 
 # Install dependencies
-RUN npm install --production
+RUN npm install
 
-# Build the application if needed
-RUN npm run build || true
-
-# Expose the port
+# Expose port
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
