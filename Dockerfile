@@ -5,14 +5,14 @@ WORKDIR /app
 # Install dependencies
 RUN apk add --no-cache git
 
-# Copy package files first
+# Copy package.json first
 COPY package.json .
-COPY package-lock.json .
-COPY server.js .
-COPY public ./public
 
 # Install dependencies
 RUN npm install
+
+# Copy the rest of the application
+COPY . .
 
 EXPOSE 3000
 
