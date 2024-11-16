@@ -1,12 +1,12 @@
 FROM node:18-alpine
 
-# Install system dependencies
-RUN apk add --no-cache libc6-compat git
-
 WORKDIR /app
 
-# Clone the official Bolt repository
-RUN git clone https://github.com/thevahidal/bolt.git .
+# Install necessary tools
+RUN apk add --no-cache curl tar
+
+# Download and extract the latest release
+RUN curl -L https://github.com/thevahidal/bolt/archive/refs/heads/main.tar.gz | tar xz --strip-components=1
 
 # Install dependencies
 RUN npm install
@@ -14,8 +14,6 @@ RUN npm install
 # Build the application
 RUN npm run build
 
-# Expose port
 EXPOSE 3000
 
-# Start the application
 CMD ["npm", "start"]
