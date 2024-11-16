@@ -1,21 +1,18 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+  bolt:
+    image: node:18-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm start"
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@db:5432/bolt
+      - PORT=3000
       - NODE_ENV=production
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXTAUTH_URL=http://posww0ccw0wws484wsccgwsk.104.37.187.180.sslip.io
-      - NEXT_PUBLIC_APP_URL=http://posww0ccw0wws484wsccgwsk.104.37.187.180.sslip.io
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - BOLT_USERNAME=${BOLT_USERNAME}
-      - BOLT_PASSWORD=${DB_PASSWORD}
-    depends_on:
-      - db
+    volumes:
+      - ./:/app
     restart: unless-stopped
 
   db:
