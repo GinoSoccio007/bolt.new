@@ -3,126 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web App Creator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
+    <title>Bolt Web IDE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
     <style>
         body {
-            font-family: -apple-system, sans-serif;
             margin: 0;
             padding: 0;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             display: flex;
         }
+
+        /* Sidebar */
         .sidebar {
             width: 250px;
-            background: white;
-            padding: 20px;
-            border-right: 1px solid #ddd;
+            background: #1e1e1e;
+            color: #fff;
             display: flex;
             flex-direction: column;
         }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .new-project-btn {
+            background: #0066ff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        /* Main Content */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: #1e1e1e;
         }
-        .button {
-            background: #0066ff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        .project-list {
-            margin-top: 20px;
+
+        /* File Explorer */
+        .file-explorer {
+            padding: 10px;
+            flex: 1;
             overflow-y: auto;
         }
-        .project-card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-            background: #f9f9f9;
+
+        .file-item {
+            padding: 5px 10px;
             cursor: pointer;
+            color: #d4d4d4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .project-card:hover {
-            background: #f0f0f0;
+
+        .file-item:hover {
+            background: #2a2a2a;
         }
+
+        /* Editor */
         .editor-container {
-            display: none;
             flex: 1;
+            display: flex;
             flex-direction: column;
         }
-        .editor-header {
-            padding: 10px;
-            background: #f5f5f5;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .file-tabs {
-            display: flex;
-            background: #f5f5f5;
+
+        .editor-tabs {
+            background: #2d2d2d;
             padding: 5px;
-            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
         }
-        .file-tab {
-            padding: 5px 15px;
-            margin-right: 5px;
-            background: #e0e0e0;
+
+        .tab {
+            padding: 8px 16px;
+            background: #383838;
+            color: #d4d4d4;
             border: none;
             cursor: pointer;
             border-radius: 4px 4px 0 0;
         }
-        .file-tab.active {
-            background: white;
+
+        .tab.active {
+            background: #1e1e1e;
             border-bottom: 2px solid #0066ff;
         }
+
         #monaco-editor {
             flex: 1;
-            min-height: 500px;
         }
-        .preview-container {
+
+        /* Modal */
+        .modal {
             display: none;
-            height: 300px;
-            border-top: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
         }
+
+        .modal-content {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            background: #383838;
+            border: 1px solid #505050;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        /* Preview */
+        .preview-container {
+            height: 300px;
+            border-top: 1px solid #333;
+            display: none;
+        }
+
         #preview-frame {
             width: 100%;
             height: 100%;
             border: none;
+            background: white;
+        }
+
+        .toolbar {
+            padding: 10px;
+            background: #2d2d2d;
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar button {
+            padding: 6px 12px;
+            background: #383838;
+            color: #d4d4d4;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .toolbar button:hover {
+            background: #404040;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Web App Creator</h2>
-        <button class="button" onclick="createProject()">New Project</button>
-        <div id="projectList" class="project-list"></div>
+        <div class="sidebar-header">
+            <h2 style="margin:0 0 10px 0">Bolt IDE</h2>
+            <button class="new-project-btn" onclick="showNewProjectModal()">New Project</button>
+        </div>
+        <div class="file-explorer" id="fileExplorer"></div>
     </div>
 
     <div class="main-content">
-        <div id="editorContainer" class="editor-container">
-            <div class="editor-header">
-                <h3 id="currentProjectName"></h3>
-                <div>
-                    <button class="button" onclick="saveCurrentFile()">Save</button>
-                    <button class="button" onclick="togglePreview()">Preview</button>
-                </div>
-            </div>
-            <div id="fileTabs" class="file-tabs"></div>
-            <div id="monaco-editor"></div>
-            <div id="previewContainer" class="preview-container">
-                <iframe id="preview-frame"></iframe>
-            </div>
+        <div class="toolbar">
+            <button onclick="saveCurrentFile()">Save</button>
+            <button onclick="togglePreview()">Preview</button>
+            <button onclick="runProject()">Run</button>
+        </div>
+        <div class="editor-tabs" id="editorTabs"></div>
+        <div id="monaco-editor"></div>
+        <div class="preview-container" id="previewContainer">
+            <iframe id="preview-frame"></iframe>
         </div>
     </div>
 
+    <div id="newProjectModal" class="modal">
+        <div class="modal-content">
+            <h2>Create New Project</h2>
+            <form id="newProjectForm" onsubmit="createProject(event)">
+                <div class="form-group">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectType">Project Type</label>
+                    <select id="projectType" required>
+                        <option value="react">React</option>
+                        <option value="vue">Vue.js</option>
+                        <option value="static">HTML/CSS/JS</option>
+                    </select>
+                </div>
+                <button type="submit" class="new-project-btn">Create Project</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
     <script>
         let editor;
         let currentProject = null;
@@ -132,122 +226,46 @@
         require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
         require(['vs/editor/editor.main'], function() {
             editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-                theme: 'vs',
+                theme: 'vs-dark',
                 automaticLayout: true,
                 minimap: { enabled: false }
             });
         });
 
-        async function createProject() {
-            const name = prompt('Enter project name:');
-            if (name) {
-                try {
-                    const response = await fetch('/api/projects', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, type: 'static' })
-                    });
-                    if (response.ok) {
-                        loadProjects();
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            }
+        function showNewProjectModal() {
+            document.getElementById('newProjectModal').style.display = 'flex';
         }
 
-        async function loadProjects() {
-            try {
-                const response = await fetch('/api/projects');
-                const projects = await response.json();
-                const list = document.getElementById('projectList');
-                list.innerHTML = projects.map(project => `
-                    <div class="project-card" onclick="openProject('${project.id}', '${project.name}')">
-                        <h3>${project.name}</h3>
-                        <p>Type: ${project.type}</p>
-                        <p>Created: ${new Date(project.created).toLocaleString()}</p>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        async function openProject(id, name) {
-            currentProject = id;
-            document.getElementById('currentProjectName').textContent = name;
-            document.getElementById('editorContainer').style.display = 'flex';
+        async function createProject(event) {
+            event.preventDefault();
+            const name = document.getElementById('projectName').value;
+            const type = document.getElementById('projectType').value;
             
             try {
-                const response = await fetch(`/api/projects/${id}/files`);
-                const { files } = await response.json();
-                showFileTabs(files);
-                if (files.length > 0) {
-                    openFile(files[0]);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        function showFileTabs(files) {
-            const tabs = document.getElementById('fileTabs');
-            tabs.innerHTML = files.map(file => `
-                <button class="file-tab" onclick="openFile('${file}')">${file}</button>
-            `).join('');
-        }
-
-        async function openFile(filename) {
-            try {
-                const response = await fetch(`/api/projects/${currentProject}/files/${filename}`);
-                const { content } = await response.json();
-                editor.setValue(content);
-                currentFile = filename;
-                
-                // Update tab highlighting
-                document.querySelectorAll('.file-tab').forEach(tab => {
-                    tab.classList.toggle('active', tab.textContent === filename);
-                });
-
-                // Set language based on file extension
-                const ext = filename.split('.').pop();
-                const language = {
-                    'js': 'javascript',
-                    'html': 'html',
-                    'css': 'css'
-                }[ext] || 'plaintext';
-                monaco.editor.setModelLanguage(editor.getModel(), language);
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        async function saveCurrentFile() {
-            if (!currentProject || !currentFile) return;
-            
-            try {
-                await fetch(`/api/projects/${currentProject}/files/${currentFile}`, {
+                const response = await fetch('/api/projects', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: editor.getValue() })
+                    body: JSON.stringify({ name, type })
                 });
-                alert('File saved!');
+                
+                if (response.ok) {
+                    const project = await response.json();
+                    document.getElementById('newProjectModal').style.display = 'none';
+                    document.getElementById('newProjectForm').reset();
+                    loadProjects();
+                }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error saving file');
+                alert('Failed to create project');
             }
         }
 
-        function togglePreview() {
-            const container = document.getElementById('previewContainer');
-            const isVisible = container.style.display === 'block';
-            container.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible && currentProject) {
-                const frame = document.getElementById('preview-frame');
-                frame.src = `/projects/${currentProject}/index.html`;
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('newProjectModal')) {
+                document.getElementById('newProjectModal').style.display = 'none';
             }
-        }
+        };
 
         // Load projects on page load
         loadProjects();
