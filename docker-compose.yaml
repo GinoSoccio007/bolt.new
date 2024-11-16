@@ -1,60 +1,26 @@
-version: '3.8'
-
 services:
-  bolt:
+  app:
     image: ghcr.io/thevahidal/bolt:latest
-    container_name: bolt
-    restart: unless-stopped
+    restart: always
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
-      # Database configuration
-      - BOLT_DATABASE_URL=postgresql://bolt_user:${DB_PASSWORD}@db:5432/bolt_db
-      # Security settings
-      - BOLT_USERNAME=${ADMIN_USERNAME:-admin}
-      - BOLT_PASSWORD=${ADMIN_PASSWORD}
-      - BOLT_JWT_SECRET=${JWT_SECRET}
-      # App configuration
+      - BOLT_DATABASE_URL=postgresql://postgres:Beachzipper66@db:5432/bolt
+      - BOLT_USERNAME=athompson
+      - BOLT_PASSWORD=Beachzipper66
+      - BOLT_JWT_SECRET=eyJhbGciOiJIUzI1NiJ9X8B4z2pY9n3mK7vQ5tR8wL1xD0fG4jH6
       - NODE_ENV=production
-      - TZ=UTC
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    networks:
-      - bolt_network
     depends_on:
       - db
 
   db:
     image: postgres:14-alpine
-    container_name: bolt-db
-    restart: unless-stopped
+    restart: always
     environment:
-      - POSTGRES_USER=bolt_user
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=bolt_db
+      - POSTGRES_PASSWORD=Beachzipper66
+      - POSTGRES_DB=bolt
     volumes:
-      - bolt_db_data:/var/lib/postgresql/data
-    networks:
-      - bolt_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bolt_user -d bolt_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-networks:
-  bolt_network:
-    driver: bridge
+      - database:/var/lib/postgresql/data
 
 volumes:
-  bolt_db_data:
-    driver: local
-
-# Environment variables needed:
-# - DB_PASSWORD: PostgreSQL database password
-# - ADMIN_USERNAME: Bolt admin username (defaults to 'admin')
-# - ADMIN_PASSWORD: Bolt admin password
-# - JWT_SECRET: Secret key for JWT token generation
+  database:
