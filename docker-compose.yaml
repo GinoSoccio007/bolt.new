@@ -2,24 +2,21 @@ version: '3.8'
 
 services:
   bolt:
-    image: node:18-alpine
+    image: thevahidal/bolt:latest
     container_name: bolt-app
-    working_dir: /app
-    command: sh -c "npm install express && node server.js"
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - DB_HOST=bolt-db
-      - DB_PASSWORD=Beachzipper66
+      - BOLT_DATABASE_URL=postgresql://postgres:Beachzipper66@bolt-db:5432/bolt
       - BOLT_USERNAME=athompson
       - BOLT_PASSWORD=Beachzipper66
-    volumes:
-      - ./:/app
+      - BOLT_JWT_SECRET=eyJhbGciOiJIUzI1NiJ9X8B4z2pY9n3mK7vQ5tR8wL1xD0fG4jH6
+      - NODE_ENV=production
     depends_on:
       - bolt-db
     networks:
       - bolt-network
+    restart: unless-stopped
 
   bolt-db:
     image: postgres:14-alpine
@@ -31,6 +28,7 @@ services:
       - bolt-data:/var/lib/postgresql/data
     networks:
       - bolt-network
+    restart: unless-stopped
 
 networks:
   bolt-network:
