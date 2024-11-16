@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  webcontainer:
     build: 
       context: .
       dockerfile: Dockerfile
@@ -11,7 +11,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - NEXT_PUBLIC_APP_URL=http://t44oocgcg8cgs4k8k4gg80wo.104.37.187.180.sslip.io
     volumes:
-      - ./data:/app/data
+      - ./workspace:/app/workspace
     restart: unless-stopped
+    privileged: true  # Required for WebContainer
